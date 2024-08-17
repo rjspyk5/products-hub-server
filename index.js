@@ -23,11 +23,6 @@ async function run() {
     const productsCollection = client
       .db("productsHub")
       .collection("productsCollection");
-
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
-
     app.get("/products", async (req, res) => {
       const categories = req?.query?.categories;
       const brand = req?.query?.brand;
