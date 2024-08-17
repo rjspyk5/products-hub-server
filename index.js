@@ -5,7 +5,15 @@ const { MongoClient, ServerApiVersion } = require("mongodb");
 const port = process.env.PORT || 5000;
 require("dotenv").config();
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://products-hub-7b147.web.app",
+      "https://products-hub-7b147.firebaseapp.com",
+    ],
+  })
+);
 const uri = process.env.URI;
 app.get("/", async (req, res) => {
   res.send("test");
