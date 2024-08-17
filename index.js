@@ -33,12 +33,14 @@ async function run() {
     );
 
     app.get("/products", async (req, res) => {
-      const page = parseInt(req?.query?.page) || 1;
-      const size = parseInt(req?.query?.size) || 10;
       const categories = req?.query?.categories;
       const brand = req?.query?.brand;
       const dateRange = req?.query?.dateRange;
-
+      const sort = req?.query?.sort;
+      const searchTerm = req?.query?.searchTerm || "";
+      const page = parseInt(req?.query?.page) || 1;
+      const size = parseInt(req?.query?.size) || 10;
+      console.log(sort);
       const filters = {};
       if (categories) {
         filters.category = { $in: categories.split(",") };
@@ -49,14 +51,30 @@ async function run() {
       if (dateRange) {
         const date = dateRange?.split(",");
         filters.productCreationDate = {
-          $gte: date[0],
-          $lte: date[1],
+          $gte: new Date(date[0]),
+          $lte: new Date(date[1]),
         };
+      }
+
+      if (searchTerm) {
+        filters.productName = { $regex: searchTerm, $options: "i" };
+      }
+
+      const sortOptions = {};
+      if (sort === "ascendingPrice") {
+        sortOptions.price = 1;
+      } else if (sort === "descendingPrice") {
+        sortOptions.price = -1;
+      } else if (sort === "ascendingDate") {
+        sortOptions.productCreationDate = 1;
+      } else if (sort === "descendingDate") {
+        sortOptions.productCreationDate = -1;
       }
 
       const result = await productsCollection
         .find(filters)
-        .skip(page * size)
+        .sort(sortOptions)
+        .skip((page - 1) * size)
         .limit(size)
         .toArray();
 
@@ -88,7 +106,6 @@ async function run() {
       res.send(result);
     });
   } finally {
-    // Ensures that the client will close when you finish/error
     // await client.close();
   }
 }
