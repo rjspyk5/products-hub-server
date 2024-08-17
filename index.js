@@ -35,8 +35,27 @@ async function run() {
     app.get("/products", async (req, res) => {
       const page = parseInt(req?.query?.page) || 1;
       const size = parseInt(req?.query?.size) || 10;
+      const categories = req?.query?.categories;
+      const brand = req?.query?.brand;
+      const dateRange = req?.query?.dateRange;
+
+      const filters = {};
+      if (categories) {
+        filters.category = { $in: categories.split(",") };
+      }
+      if (brand) {
+        filters.brand = { $in: brand.split(",") };
+      }
+      if (dateRange) {
+        const date = dateRange?.split(",");
+        filters.productCreationDate = {
+          $gte: date[0],
+          $lte: date[1],
+        };
+      }
+
       const result = await productsCollection
-        .find()
+        .find(filters)
         .skip(page * size)
         .limit(size)
         .toArray();
