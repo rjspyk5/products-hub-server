@@ -36,6 +36,26 @@ async function run() {
       const result = await productsCollection.find().toArray();
       res.send(result);
     });
+    app.get("/catagoriesandbrand", async (req, res) => {
+      const pipeline = [
+        {
+          $group: {
+            _id: null,
+            categories: { $addToSet: "$category" },
+            brands: { $addToSet: "$brand" },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            categories: 1,
+            brands: 1,
+          },
+        },
+      ];
+      const result = await productsCollection.aggregate(pipeline).toArray();
+      res.send(result);
+    });
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
