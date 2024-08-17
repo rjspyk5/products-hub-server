@@ -33,8 +33,20 @@ async function run() {
     );
 
     app.get("/products", async (req, res) => {
-      const result = await productsCollection.find().toArray();
+      const page = parseInt(req?.query?.page) || 1;
+      const size = parseInt(req?.query?.size) || 10;
+      const result = await productsCollection
+        .find()
+        .skip(page * size)
+        .limit(size)
+        .toArray();
+
       res.send(result);
+    });
+
+    app.get("/productsCount", async (req, res) => {
+      const result = await productsCollection.estimatedDocumentCount();
+      res.send({ productsCount: result });
     });
     app.get("/catagoriesandbrand", async (req, res) => {
       const pipeline = [
