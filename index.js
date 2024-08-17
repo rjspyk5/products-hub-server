@@ -24,10 +24,6 @@ async function run() {
       .db("productsHub")
       .collection("productsCollection");
 
-    // Connect the client to the server	(optional starting in v4.7)
-    // await client.connect();
-    // Send a ping to confirm a successful connection
-    // await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
@@ -106,7 +102,6 @@ async function run() {
       res.send(result);
     });
   } finally {
-    // await client.close();
   }
 }
 run().catch(console.dir);
